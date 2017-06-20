@@ -6,7 +6,7 @@ A python module for interfacing a 594 shift register with a target who is mraa r
 
 * Using setup.py and **setuptools**:
 ```sh
-$ git clone git@github.com:respekt1/MRAA594Shift.git
+$ git clone git@github.com:Respekt1/MRAA594Shift.git
 $ ./setup.py install MRAA594Shift
 ```
 # Usage
