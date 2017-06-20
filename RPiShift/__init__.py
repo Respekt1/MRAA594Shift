@@ -1,46 +1,49 @@
 #! /usr/bin/env python
-# RpiShift
-# Using the 595 shift register with the Raspberry Pi
-# Copyright (c) 2014 Kyle J. Kneitinger
-# kylejkneitinger@gmail.com
+# MRAA594Shift
+# Using the 594 shift register
+# Copyright (c) 2017 Patric Lintschinger
+# lint_patric@cable.vol.at
 
-import RPi.GPIO as GPIO
+import mraa
 from time import sleep
+
 class Shifter:
+
     """Set pins for data, clock and latch; chain length and board mode respectively"""
-    def __init__(self, dataPin, clockPin, latchPin, chain = 1,
-            boardMode = GPIO.BOARD):
-        self.DATA = dataPin
-        self.CLOCK = clockPin
-        self.LATCH = latchPin
-        self.CHAIN = chain
-        self.BOARDMODE = boardMode
+    def __init__(self, dataPin, clockPin, latchPin, chain = 1):
+        self.DATA = mraa.Gpio(dataPin)
+        self.CLOCK = mraa.Gpio(clockPin)
+        self.LATCH = mraa.Gpio(latchPin)
+        self.CHAIN = mraa.Gpio(chain)
+        self.CHAIN_PIN = chain
 
         """Value stored in 595's storage register"""
         self.STORED=0x00
 
         # Setup pins
-        GPIO.setmode(self.BOARDMODE)
-        GPIO.setup(self.DATA, GPIO.OUT)
-        GPIO.setup(self.LATCH, GPIO.OUT, initial=GPIO.LOW)
-        GPIO.setup(self.CLOCK, GPIO.OUT, initial=GPIO.LOW)
+        self.DATA.dir(mraa.DIR_OUT)
+        self.LATCH.dir(mraa.DIR_OUT)
+        self.LATCH.write(0)
+        self.CLOCK.dir(mraa.DIR_OUT)
+        self.CLOCK.write(0)
+
 
     """Push a single bit into the registers.
-    writeLatch should be called after 8*CHAIN pushes"""
+    writeLatch should be called after 8*CHAIN_PIN pushes"""
     def pushBit(self,state):
-        GPIO.output(self.CLOCK, 0)
-        GPIO.output(self.DATA, state)
-        GPIO.output(self.CLOCK, 1)
+        self.CLOCK.write(0)
+        self.DATA.write(state)
+        self.CLOCK.write(1)
 
     """Transfer bits from shift register to storage register"""
     def writeLatch(self):
-        GPIO.output(self.LATCH, 1)
-        GPIO.output(self.LATCH, 0)
+        self.LATCH.write(1)
+        self.LATCH.write(0)
 
-    """Write a byte of length 8*CHAIN to the 595"""
+    """Write a byte of length 8*CHAIN_PIN to the 594"""
     def writeByte(self,value):
-        for i in range(8*self.CHAIN):
-            bit = (value << i) & (0x80 << 2*(self.CHAIN-1))
+        for i in range(8*self.CHAIN_PIN):
+            bit = (value << i) & (0x80 << 2*(self.CHAIN_PIN-1))
             self.pushBit( bit )
         self.writeLatch()
         self.STORED=value
@@ -57,4 +60,6 @@ class Shifter:
 
     """Clean up pins"""
     def cleanup(self):
-        GPIO.cleanup()
+        self.DATA.write(0)
+        self.LATCH.write(0)
+        self.CLOCK.write(0)
