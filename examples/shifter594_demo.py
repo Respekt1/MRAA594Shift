@@ -5,10 +5,11 @@
 # lint_patric@cable.vol.at
 
 from time import sleep
+
 import shifter594
 
 #dataPin, clockPin, latchPin
-Shifter = shifter594.Shifter(2,0,1)
+Shifter = shifter594.Shifter(1, 0, 2)
 
 def testFunc():
     Shifter.writeByte(0xFF)
@@ -21,6 +22,7 @@ def testFunc():
 
 # Catch ^C and cleanup pins before exiting
 try:
+    print("START TEST SHIFTER 594")
     testFunc()
 except KeyboardInterrupt:
     Shifter.cleanup()
