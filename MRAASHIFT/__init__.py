@@ -7,6 +7,9 @@
 import mraa
 from time import sleep
 
+mraa.initJsonPlatform("/home/root/mraa-json-api/gs1-mraa-baseboard.json")
+
+
 class Shifter:
 
     """Set pins for data, clock and latch; chain length and board mode respectively"""
@@ -43,7 +46,8 @@ class Shifter:
     """Write a byte of length 8*CHAIN_PIN to the 594"""
     def writeByte(self,value):
         for i in range(8*self.CHAIN_PIN):
-            bit = (value << i) & (0x80 << 2*(self.CHAIN_PIN-1))
+            mybit = value & (1 << ((8*self.CHAIN_PIN - 1) - i ) )
+            bit = mybit >> ((8*self.CHAIN_PIN - 1) - i )
             self.pushBit( bit )
         self.writeLatch()
         self.STORED=value
