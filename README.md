@@ -11,3 +11,6 @@ $ ./setup.py install MRAA594Shift
 ```
 # Usage
 
+call MRAA JSON API if needed (only custom board; NOT BBB; NOT Raspberry PI)
+
+`export MRAA_JSON_PLATFORM="/home/root/mraa-json-api/gs1-mraa-baseboard.json"`
